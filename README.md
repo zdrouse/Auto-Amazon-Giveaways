@@ -1,4 +1,4 @@
-# Auto-Amazon-GiveAways
+# Auto-Amazon-Giveaways
 Implementation for this project is currently a work-in-progress.  Issues are expected.
 
 ## Install
