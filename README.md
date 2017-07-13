@@ -17,7 +17,7 @@ ChromeDriver must be installed.
 Assuming `git` is installed on the local machine:
 
  - Open `command-prompt` and `cd` to a location/folder to save the project.
- - Perform `git clone https://github.com/rousez/Auto-Amazon-GiveAways`.
+ - Perform `git clone https://github.com/rousez/Auto-Amazon-Giveaways`.
 
 ## Run
  - `python give_it_away_now.py`
