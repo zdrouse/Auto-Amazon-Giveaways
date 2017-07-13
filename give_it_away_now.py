@@ -1,5 +1,6 @@
 import datetime
 import time
+import getpass
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
@@ -18,10 +19,12 @@ global won_giveaways, lost_giveaways, entered_giveaways, completed_giveaways
 # time stamp for log file
 time_stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 # account login
-username = chromedriver.find_element_by_name('email')
-username.send_keys('zdrouse@gmail.com')
+user_email_input = input('Enter your Amazon email address: ')
+email = chromedriver.find_element_by_name('email')
+email.send_keys(user_email_input)
+user_password_input = getpass.getpass('Enter your Amazon password: ')
 password = chromedriver.find_element_by_name('password')
-password.send_keys('')
+password.send_keys(user_password_input)
 sign_in_submit = chromedriver.find_element_by_id('signInSubmit')
 sign_in_submit.click()
 time.sleep(3)
