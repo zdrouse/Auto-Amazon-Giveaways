@@ -1,6 +1,7 @@
 # Auto-Amazon-GiveAways
-## Installation
+Implementation for this project is currently a work-in-progress.  Issues are expected.
 
+## Install
 [Python 2.7.X](https://www.python.org/downloads/) must be installed.
 
 After Python is installed, open `command-prompt` and use `pip` to install dependencies:

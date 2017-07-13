@@ -7,8 +7,14 @@ from selenium.webdriver.chrome.options import Options
 from colorama import init, Fore, Back, Style
 
 init(autoreset=True)
+# add default options for chromedriver, this specifies to use mobile user-agent for easy loading.
+opts = Options()
+opts.add_argument(
+    'user-agent=Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30')
+# initialize chromedriver global variable.
+chromedriver = None
 
-# global element vars
+# global element vars.
 instant_box = 'box_click_target'
 enter_button = 'enterSubmitForm'
 enter_poll = 'enterPollButton'
@@ -19,59 +25,29 @@ twitter_follow_enter_id = 'ts_fo_follow'
 next_button = '.a-last'
 auth_error_message = 'auth-error-message-box'
 
-# global counter variables
+# global counter variables.
 won_giveaways = 0
 lost_giveaways = 0
 entered_giveaways = 0
 completed_giveaways = 0
 
-#global functions
+# global functions
+# boolean function to find if an element id exists.
 def check_for_element_id(element_id):
+    global chromedriver
     try:
         chromedriver.find_element_by_id(element_id)
         return True
     except:
         return False
-
+# boolean function to find if a css selector exists.
 def check_for_css_selector(css_selector):
+    global chromedriver
     try:
         chromedriver.find_element_by_css_selector(css_selector)
         return True
     except:
         return False
-
-#user input
-user_email_input = raw_input("Enter your Amazon email address: ")
-# user_email_input = str(user_email_input.encode('utf-8'))
-user_password_input = getpass.getpass("Enter your Amazon password: ")
-
-#launch chromedriver with opts args
-opts = Options()
-opts.add_argument(
-    'user-agent=Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30')
-chromedriver = webdriver.Chrome('/Python27/selenium/webdriver/chromedriver', chrome_options=opts)
-chromedriver.get(
-    'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways')
-time.sleep(1)
-# time stamp for log file
-time_stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-
-# account login
-email = chromedriver.find_element_by_name('email')
-email.send_keys(user_email_input)
-password = chromedriver.find_element_by_name('password')
-password.send_keys(user_password_input)
-sign_in_submit = chromedriver.find_element_by_id('signInSubmit')
-sign_in_submit.click()
-time.sleep(3)
-
-is_login_error = check_for_element_id(auth_error_message)
-
-if is_login_error is True:
-    print(Fore.RED + Style.BRIGHT + "\nAmazon Login Unsuccessful!  Exiting...")
-    exit()
-else:
-    print(Fore.GREEN + Style.BRIGHT + "\nAmazon Login Successful!  Continuing...")
 
 # function to process the 'None' requirement giveaways.
 def process_no_req_giveaways():
@@ -420,7 +396,41 @@ def process_twitter_follow_giveaways():
             chromedriver.switch_to.window(chromedriver.window_handles[0])
 # main method
 def main():
+    # use the global chromedriver variable.
+    global chromedriver
+    # start at page 1 of Giveaways.
     page_count = 1
+    # user email and password inputs.
+    user_email_input = raw_input("Enter your Amazon email address: ")
+    user_password_input = getpass.getpass("Enter your Amazon password: ")
+    # launch chromedriver with opts args.
+    chromedriver = webdriver.Chrome('/Python27/selenium/webdriver/chromedriver', chrome_options=opts)
+    # navigate to Amazon sign-in page with redirect to the Giveaway homepage.
+    chromedriver.get(
+        'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways')
+    time.sleep(1)
+    # time stamp for log file
+    time_stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+    print(Fore.CYAN + Style.BRIGHT + "\nLogging into Amazon..."),
+    # Amazon account login
+    email = chromedriver.find_element_by_name('email')
+    email.send_keys(user_email_input)
+    password = chromedriver.find_element_by_name('password')
+    password.send_keys(user_password_input)
+    sign_in_submit = chromedriver.find_element_by_id('signInSubmit')
+    sign_in_submit.click()
+    time.sleep(3)
+
+    is_login_error = check_for_element_id(auth_error_message)
+
+    if is_login_error is True:
+        print(Fore.RED + Style.BRIGHT + "Login Unsuccessful!  Exiting...")
+        exit(1)
+    else:
+        print(Fore.GREEN + Style.BRIGHT + "Login Successful!  Continuing...")
+    time.sleep(5)
+
     is_next = check_for_css_selector(next_button)
     while is_next is True:
         print(Fore.CYAN + Style.BRIGHT + '\nProcessing GiveAways for Page: %s' % page_count)
@@ -445,6 +455,7 @@ def main():
     print "\nTotal instant giveaways: %d" % instant_giveaways
     print "\nAlready completed giveaways: %d" % completed_giveaways
     print "\nALL giveaways: %d" % all_giveaways
+    exit(0)
 
 # process main method call
 if __name__ == '__main__':
