@@ -247,6 +247,19 @@ def process_tweet_giveaways():
                     print "\nThis shouldn't happen.  RUN!"
                 chromedriver.close()
                 chromedriver.switch_to.window(chromedriver.window_handles[0])
+            else:
+                get_result = chromedriver.find_element_by_id('title')
+                time.sleep(5)
+                if "you didn't win" in get_result.text:
+                    completed_giveaways += 1
+                    print(Fore.YELLOW + Style.BRIGHT + '\n    **** You have already completed this GiveAway and you did not win.')
+                elif "your entry has been received" in get_result.text:
+                    completed_giveaways += 1
+                    print(Fore.YELLOW + Style.BRIGHT + '\n    **** Your entry has already been received for this GiveAway.')
+                else:
+                    print(Fore.RED + Style.BRIGHT + '\n    ---- Your Twitter account may not be authorized with Amazon.')
+                chromedriver.close()
+                chromedriver.switch_to.window(chromedriver.window_handles[0])
         else:
             get_result = chromedriver.find_element_by_id('title')
             time.sleep(5)
@@ -381,6 +394,19 @@ def process_twitter_follow_giveaways():
                     print(Fore.RED + Style.BRIGHT + '\n    ---- You have already completed this GiveAway or your Twitter account is not authorized to complete GiveAways with Amazon.')
                 chromedriver.close()
                 chromedriver.switch_to.window(chromedriver.window_handles[0])
+            else:
+                get_result = chromedriver.find_element_by_id('title')
+                time.sleep(5)
+                if "you didn't win" in get_result.text:
+                    completed_giveaways += 1
+                    print(Fore.YELLOW + Style.BRIGHT + '\n    **** You have already completed this GiveAway and you did not win.')
+                elif "your entry has been received" in get_result.text:
+                    completed_giveaways += 1
+                    print(Fore.YELLOW + Style.BRIGHT + '\n    **** Your entry has already been received for this GiveAway.')
+                else:
+                    print(Fore.RED + Style.BRIGHT + '\n    ---- Your Twitter account may not be authorized with Amazon.')
+                chromedriver.close()
+                chromedriver.switch_to.window(chromedriver.window_handles[0])
         else:
             get_result = chromedriver.find_element_by_id('title')
             time.sleep(5)
@@ -399,7 +425,7 @@ def main():
     # use the global chromedriver variable.
     global chromedriver
     # start at page 1 of Giveaways.
-    page_count = 1
+    page_count = 14
     # user email and password inputs.
     user_email_input = raw_input("Enter your Amazon email address: ")
     user_password_input = getpass.getpass("Enter your Amazon password: ")
@@ -407,7 +433,7 @@ def main():
     chromedriver = webdriver.Chrome('/Python27/selenium/webdriver/chromedriver', chrome_options=opts)
     # navigate to Amazon sign-in page with redirect to the Giveaway homepage.
     chromedriver.get(
-        'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways')
+        'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways?pageId=14')
     time.sleep(1)
     # time stamp for log file
     time_stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
