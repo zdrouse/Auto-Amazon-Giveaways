@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from colorama import init, Fore, Back, Style
+from playsound import playsound
 
 init(autoreset=True)
 # add default options for chromedriver, this specifies to use mobile user-agent for easy loading.
@@ -24,6 +25,7 @@ twitter_follow_id = 'lu_fo_follow'
 twitter_follow_enter_id = 'ts_fo_follow'
 next_button = '.a-last'
 auth_error_message = 'auth-error-message-box'
+auth_warning_message = 'auth-warning-message-box'
 
 # global counter variables.
 won_giveaways = 0
@@ -89,6 +91,8 @@ def process_no_req_giveaways():
             elif "you're a winner!" in get_result.text:
                 won_giveaways += 1
                 print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
+                time.sleep(1)
+                playsound('.\sounds\\btyswt.mp3')
                 time.sleep(5)
             else:
                 print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
@@ -173,6 +177,8 @@ def process_tweet_giveaways():
                 elif "you're a winner!" in get_result.text:
                     won_giveaways += 1
                     print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
+                    time.sleep(1)
+                    playsound('.\sounds\\btyswt.mp3')
                     time.sleep(5)
                 else:
                     print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
@@ -223,6 +229,8 @@ def process_tweet_giveaways():
                 elif "you're a winner!" in get_result.text:
                     won_giveaways += 1
                     print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
+                    time.sleep(1)
+                    playsound('.\sounds\\btyswt.mp3')
                     time.sleep(5)
                 else:
                     get_result = chromedriver.find_element_by_id('title')
@@ -323,6 +331,8 @@ def process_twitter_follow_giveaways():
                 elif "you're a winner!" in get_result.text:
                     won_giveaways += 1
                     print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
+                    time.sleep(1)
+                    playsound('.\sounds\\btyswt.mp3')
                     time.sleep(5)
                 else:
                     print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
@@ -376,6 +386,8 @@ def process_twitter_follow_giveaways():
                 elif "you're a winner!" in get_result.text:
                     won_giveaways += 1
                     print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
+                    time.sleep(1)
+                    playsound('.\sounds\\btyswt.mp3')
                     time.sleep(5)
                 else:
                     print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
@@ -425,7 +437,7 @@ def main():
     # use the global chromedriver variable.
     global chromedriver
     # start at page 1 of Giveaways.
-    page_count = 14
+    page_count = 40
     # user email and password inputs.
     user_email_input = raw_input("Enter your Amazon email address: ")
     user_password_input = getpass.getpass("Enter your Amazon password: ")
@@ -433,7 +445,7 @@ def main():
     chromedriver = webdriver.Chrome('/Python27/selenium/webdriver/chromedriver', chrome_options=opts)
     # navigate to Amazon sign-in page with redirect to the Giveaway homepage.
     chromedriver.get(
-        'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways?pageId=14')
+        'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways?pageId=40')
     time.sleep(1)
     # time stamp for log file
     time_stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -449,9 +461,19 @@ def main():
     time.sleep(3)
 
     is_login_error = check_for_element_id(auth_error_message)
+    is_login_warning = check_for_element_id(auth_warning_message)
 
     if is_login_error is True:
         print(Fore.RED + Style.BRIGHT + "Login Unsuccessful!  Exiting...")
+        time.sleep(1)
+        playsound('.\sounds\\fr.mp3')
+        chromedriver.quit()
+        exit(1)
+    elif is_login_warning is True:
+        print(Fore.YELLOW + Style.BRIGHT + "Login Unsuccessful!  Enter credentials with Captcha or script will exit...")
+        time.sleep(60)
+        # playsound('.\sounds\\fr.mp3')
+        chromedriver.quit()
         exit(1)
     else:
         print(Fore.GREEN + Style.BRIGHT + "Login Successful!  Continuing...")
