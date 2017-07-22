@@ -8,6 +8,7 @@ After Python is installed, open `command-prompt` and use `pip` to install depend
 
  - `pip install selenium`
  - `pip install colorama`
+ - `pip install playsound`
 
 ChromeDriver must be installed.
 
