@@ -112,7 +112,7 @@ def process_no_req_giveaways():
                 won_giveaways += 1
                 print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
                 time.sleep(1)
-                playsound('.\sounds\\btyswt.mp3')
+                playsound('./sounds//btyswt.mp3')
                 time.sleep(5)
             else:
                 print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
@@ -198,7 +198,7 @@ def process_tweet_giveaways():
                     won_giveaways += 1
                     print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
                     time.sleep(1)
-                    playsound('.\sounds\\btyswt.mp3')
+                    playsound('./sounds//btyswt.mp3')
                     time.sleep(5)
                 else:
                     print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
@@ -250,7 +250,7 @@ def process_tweet_giveaways():
                     won_giveaways += 1
                     print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
                     time.sleep(1)
-                    playsound('.\sounds\\btyswt.mp3')
+                    playsound('./sounds//btyswt.mp3')
                     time.sleep(5)
                 else:
                     get_result = chromedriver.find_element_by_id('title')
@@ -352,7 +352,7 @@ def process_twitter_follow_giveaways():
                     won_giveaways += 1
                     print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
                     time.sleep(1)
-                    playsound('.\sounds\\btyswt.mp3')
+                    playsound('./sounds//btyswt.mp3')
                     time.sleep(5)
                 else:
                     print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
@@ -407,7 +407,7 @@ def process_twitter_follow_giveaways():
                     won_giveaways += 1
                     print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
                     time.sleep(1)
-                    playsound('.\sounds\\btyswt.mp3')
+                    playsound('./sounds//btyswt.mp3')
                     time.sleep(5)
                 else:
                     print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
@@ -467,7 +467,7 @@ def main():
     user_email_input = raw_input("Enter your Amazon email address: ")
     user_password_input = getpass.getpass("Enter your Amazon password: ")
     # launch chromedriver with opts args.
-    chromedriver = webdriver.Chrome('/Python27/selenium/webdriver/chromedriver', chrome_options=opts)
+    chromedriver = webdriver.Chrome('/Users/zack/PycharmProjects/chromedriver', chrome_options=opts)
     # navigate to Amazon sign-in page with redirect to the Giveaway homepage.
     chromedriver.get(
         'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways')
@@ -494,7 +494,7 @@ def main():
     if is_login_error is True:
         print(Fore.RED + Style.BRIGHT + "Login Unsuccessful!  Exiting...")
         time.sleep(1)
-        playsound('.\sounds\\fr.mp3')
+        playsound('./sounds//fr.mp3')
         chromedriver.quit()
         exit(1)
     elif is_login_warning is True:
