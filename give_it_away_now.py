@@ -51,6 +51,26 @@ def check_for_css_selector(css_selector):
     except:
         return False
 
+def instant_giveaway(prize_name):
+    global won_giveaways, lost_giveaways
+    giveaway_box = chromedriver.find_element_by_id(instant_box)
+    giveaway_box.click()
+    time.sleep(10)
+    get_result = chromedriver.find_element_by_id('title')
+    time.sleep(5)
+    if "you didn't win" in get_result.text:
+        lost_giveaways += 1
+        print(Fore.YELLOW + Style.BRIGHT + '\n    **** You did not win: %s' % prize_name)
+        time.sleep(5)
+    elif "you're a winner!" in get_result.text:
+        won_giveaways += 1
+        print(Fore.GREEN + Style.BRIGHT + '\n    **** Winner Winner! Chicken Dinner!: %s' % prize_name)
+        time.sleep(1)
+        playsound('.\sounds\\btyswt.mp3')
+        time.sleep(5)
+    else:
+        print(Fore.RED + Style.BRIGHT + '\n    ---- UNRECOGNIZED RESPONSE FOR: %s' % prize_name)
+
 # function to process the 'None' requirement giveaways.
 def process_no_req_giveaways():
     global won_giveaways, lost_giveaways, entered_giveaways, completed_giveaways
@@ -158,7 +178,7 @@ def process_tweet_giveaways():
         if is_tweet is True and is_tweet_enter is False:
             tweet_button = chromedriver.find_element_by_id(tweet_id)
             tweet_button.click()
-            time.sleep(5)
+            time.sleep(10)
             
             # determine whether the tweet giveaway is instance or entered
             is_instant = check_for_element_id(instant_box)
@@ -210,7 +230,7 @@ def process_tweet_giveaways():
         elif is_tweet_enter is True and is_tweet is False:
             tweet_enter_button = chromedriver.find_element_by_id(tweet_enter_id)
             tweet_enter_button.click()
-            time.sleep(5)
+            time.sleep(10)
             
             # determine whether the tweet giveaway is instance or entered
             is_instant = check_for_element_id(instant_box)
@@ -313,8 +333,8 @@ def process_twitter_follow_giveaways():
         if is_twitter_follow is True and is_twitter_follow_enter is False:
             twitter_follow_button = chromedriver.find_element_by_id(twitter_follow_id)
             twitter_follow_button.click()
-            time.sleep(5)
-            # determine whether the tweet giveaway is instance or entered
+            time.sleep(10)
+            # determine whether the tweet giveaway is instant or entered
             is_instant = check_for_element_id(instant_box)
             is_enter = check_for_element_id(enter_button)
         
@@ -367,9 +387,9 @@ def process_twitter_follow_giveaways():
         elif is_twitter_follow_enter is True and is_twitter_follow is False:
             twitter_follow_enter_button = chromedriver.find_element_by_id(twitter_follow_enter_id)
             twitter_follow_enter_button.click()
-            time.sleep(5)
+            time.sleep(10)
             
-            # determine whether the tweet giveaway is instance or entered
+            # determine whether the tweet giveaway is instant or entered
             is_instant = check_for_element_id(instant_box)
             is_enter = check_for_element_id(enter_button)
         
@@ -429,15 +449,20 @@ def process_twitter_follow_giveaways():
                 completed_giveaways += 1
                 print(Fore.YELLOW + Style.BRIGHT + '\n    **** Your entry has already been received for this GiveAway.')
             else:
-                print(Fore.RED + Style.BRIGHT + '\n    ---- Your Twitter account may not be authorized with Amazon.')
-            chromedriver.close()
-            chromedriver.switch_to.window(chromedriver.window_handles[0])
+                try:
+                    instant_giveaway(prize_name)
+                    chromedriver.close()
+                    chromedriver.switch_to.window(chromedriver.window_handles[0])
+                except Exception as e:
+                    raise e
+            #chromedriver.close()
+            #chromedriver.switch_to.window(chromedriver.window_handles[0])
 # main method
 def main():
     # use the global chromedriver variable.
     global chromedriver
     # start at page 1 of Giveaways.
-    page_count = 40
+    page_count = 1
     # user email and password inputs.
     user_email_input = raw_input("Enter your Amazon email address: ")
     user_password_input = getpass.getpass("Enter your Amazon password: ")
@@ -445,7 +470,7 @@ def main():
     chromedriver = webdriver.Chrome('/Python27/selenium/webdriver/chromedriver', chrome_options=opts)
     # navigate to Amazon sign-in page with redirect to the Giveaway homepage.
     chromedriver.get(
-        'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways?pageId=40')
+        'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways')
     time.sleep(1)
     # time stamp for log file
     time_stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -456,6 +481,9 @@ def main():
     email.send_keys(user_email_input)
     password = chromedriver.find_element_by_name('password')
     password.send_keys(user_password_input)
+    grab_checkboxes = chromedriver.find_elements_by_css_selector('.a-icon.a-icon-checkbox')
+    keep_signed_in = grab_checkboxes[1]
+    keep_signed_in.click()
     sign_in_submit = chromedriver.find_element_by_id('signInSubmit')
     sign_in_submit.click()
     time.sleep(3)
