@@ -9,9 +9,9 @@ from playsound import playsound
 
 init(autoreset=True)
 # add default options for chromedriver, this specifies to use mobile user-agent for easy loading.
-opts = Options()
-opts.add_argument(
-    'user-agent=Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30')
+# opts = Options()
+# opts.add_argument(
+#    'user-agent=Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30')
 # initialize chromedriver global variable.
 chromedriver = None
 
@@ -467,7 +467,7 @@ def main():
     user_email_input = raw_input("Enter your Amazon email address: ")
     user_password_input = getpass.getpass("Enter your Amazon password: ")
     # launch chromedriver with opts args.
-    chromedriver = webdriver.Chrome('/Users/zack/PycharmProjects/chromedriver', chrome_options=opts)
+    chromedriver = webdriver.Chrome('\Python27\selenium\webdriver\chromedriver.exe')
     # navigate to Amazon sign-in page with redirect to the Giveaway homepage.
     chromedriver.get(
         'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fga%2Fgiveaways')
@@ -481,8 +481,7 @@ def main():
     email.send_keys(user_email_input)
     password = chromedriver.find_element_by_name('password')
     password.send_keys(user_password_input)
-    grab_checkboxes = chromedriver.find_elements_by_css_selector('.a-icon.a-icon-checkbox')
-    keep_signed_in = grab_checkboxes[1]
+    keep_signed_in = chromedriver.find_element_by_name('rememberMe')
     keep_signed_in.click()
     sign_in_submit = chromedriver.find_element_by_id('signInSubmit')
     sign_in_submit.click()
