@@ -18,7 +18,7 @@ ChromeDriver must be installed.
 Assuming `git` is installed on the local machine:
 
  - Open `command-prompt` and `cd` to a location/folder to save the project.
- - Perform `git clone https://github.com/rousez/Auto-Amazon-Giveaways`.
+ - Perform `git clone https://github.com/zdrouse/Auto-Amazon-Giveaways`.
  - Edit this line for your own chromedriver path:  `chromedriver = webdriver.Chrome('/PATH/TO/chromedriver', chrome_options=opts)`
  	- The script needs to know where your chromedriver is installed.
 
