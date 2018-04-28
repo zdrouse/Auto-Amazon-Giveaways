@@ -53,7 +53,7 @@ class GiveAwayBot(object):
         await asyncio.sleep(2)
         # this will navigate to root Giveaway page after successful login and return the page.
         ga_page = await self._nav_to_ga(login_page)
-        await asyncio.sleep(15)
+        await asyncio.sleep(3)
         return ga_page
         #await self.browser.close()
 
@@ -79,25 +79,20 @@ class GiveAwayBot(object):
                 '(prize_name_element) => prize_name_element.textContent',
                 prize_name_element
             )
-            print(prize_name)
             prize_req_element = await giveaway.querySelector('.giveawayParticipationInfoContainer')
             prize_req = await ga_page.evaluate(
                 '(prize_req_element) => prize_req_element.textContent',
                 prize_req_element
             )
-            print(prize_req)
-            prize_url_element = await giveaway.querySelector('.a-link-normal')
-            print(prize_url_element)
-            prize_url = await ga_page.evaluate(
-                '(prize_url_element) => prize_url_element.href',
-                prize_url_element
+            prize_href = await ga_page.evaluate(
+                '(giveaway) => giveaway.href',
+                giveaway
             )
-            print(prize_url)
-            prize_url = parse_prize_url(prize_url)
-            print(prize_url)
+            prize_url = parse_prize_url(prize_href)
             ga_prize = GiveAwayPrize()
             ga_prize.set_prize_name(prize_name)
             ga_prize.set_prize_req(prize_req)
+            print(" ")
             ga_prize.set_prize_url(prize_url)
             print(ga_prize)
             #self.ga_prizes[] = {}
