@@ -1,10 +1,13 @@
 import asyncio
-from pyppeteer import launch
-from prize import GiveAwayPrize
 import getpass
 import logging
 import json
 import re
+from pyppeteer import launch
+from lib.prize import GiveAwayPrize
+from colorama import init, Fore, Back, Style
+
+init(autoreset=True)
 
 class GiveAwayBot(object):
     def __init__(self):
@@ -33,11 +36,14 @@ class GiveAwayBot(object):
                 await login_page.click(continue_button)
             else:
                 pass
-                
-        print('Logging into Amazon...')
+        
+        login_msg = Fore.LIGHTYELLOW_EX + 'Log into Amazon...'
+        print(login_msg)
         if init:
-            self.email = input('Enter your Amazon email address: ')
-            self.password = getpass.getpass('Enter your Amazon password: ')
+            email_msg = 'Enter your Amazon email address: '
+            pass_msg = 'Enter your Amazon password: '
+            self.email = input(email_msg)
+            self.password = getpass.getpass(pass_msg)
         self.browser = await get_browser()
         login_page = await self.browser.newPage()
         await login_page.setViewport({'width': 1800, 'height': 1000})
@@ -65,7 +71,59 @@ class GiveAwayBot(object):
             return page_giveaways
         else:
             return None
+
+    def display_ga_process(self, ga_name):
+        ga_process = Fore.CYAN + Style.BRIGHT + 'Processing GiveAway:{0}  {1}'.format(Style.RESET_ALL, ga_name)
+        print(ga_process)
+
+    async def check_for_entered(self, prize_page):
+        await prize_page.waitForSelector('.qa-giveaway-result-text')
+        ga_result_element = await prize_page.querySelector('.qa-giveaway-result-text')
+        ga_result = await prize_page.evaluate(
+            '(ga_result_element) => ga_result_element.textContent',
+            ga_result_element
+        )
+        if ga_result_element and "didn't win" in ga_result:
+            msg = Fore.MAGENTA + Style.BRIGHT + "    **** Already entered giveaway and you didn't win. ****"
+            print(msg)
+            return True
+        else:
+            return False
     
+    async def display_ga_result(self, prize_page):
+        await prize_page.waitForSelector('.qa-giveaway-result-text')
+        ga_result_element = await prize_page.querySelector('.qa-giveaway-result-text')
+        ga_result = await prize_page.evaluate(
+            '(ga_result_element) => ga_result_element.textContent',
+            ga_result_element
+        )
+        if "didn't win" in ga_result:
+            msg = Fore.YELLOW + Style.BRIGHT + "  **** You entered the giveaway but did not win. ****"
+            print(msg)
+        else:
+            msg = Fore.GREEN + Style.BRIGHT + "   **** Maybe you won?? ****"
+            print(msg)
+
+    async def no_req_giveaways(self):
+        print()
+        for prize in self.ga_prizes:
+            if 'No entry requirement' in self.ga_prizes[prize]['Requirement'] and self.ga_prizes[prize]['Entered'] is False:
+                self.display_ga_process(self.ga_prizes[prize]['Name'])
+                prize_page = await self.browser.newPage()
+                await prize_page.setViewport({'width': 1800, 'height': 1000})
+                await prize_page.goto(self.ga_prizes[prize]['Url'])
+                await asyncio.sleep(4)
+                ga_entry = await self.check_for_entered(prize_page)
+                if ga_entry is False:
+                    await prize_page.waitForSelector('#box_click_target')
+                    prize_box = await prize_page.querySelector('#box_click_target')
+                    await prize_box.click()
+                    await asyncio.sleep(4)
+                    await self.display_ga_result(prize_page)
+                    await prize_page.close()
+                else:
+                    await prize_page.close()
+            
     async def process_giveaways(self, ga_page):
 
         async def create_ga_prize(giveaway):
@@ -92,28 +150,18 @@ class GiveAwayBot(object):
             ga_prize = GiveAwayPrize()
             ga_prize.set_prize_name(prize_name)
             ga_prize.set_prize_req(prize_req)
-            print(" ")
             ga_prize.set_prize_url(prize_url)
-            print(ga_prize)
-            #self.ga_prizes[] = {}
+            self.ga_prizes[len(self.ga_prizes)] = {
+                'Name': ga_prize.get_prize_name(),
+                'Requirement': ga_prize.get_prize_req(),
+                'Url': ga_prize.get_prize_url(),
+                'Entered': False
+            }
         
         page_giveaways = await self.get_page_giveaways(ga_page)
         if page_giveaways:
             for giveaway in page_giveaways:
                 await create_ga_prize(giveaway)
+            await self.no_req_giveaways()
         else:
             print('*** no giveaways returned ***')
-
-    '''async def no_req_giveaways(self, ga_page):
-        if prize_name:
-            print('{0} found'.format(prize_name))
-            print(prize_name)
-        else:
-            print('Error getting prize name')'''
-
-async def main():
-    ga_bot = GiveAwayBot()
-    ga_page = await ga_bot.login()
-    await ga_bot.process_giveaways(ga_page)
-
-asyncio.get_event_loop().run_until_complete(main())
