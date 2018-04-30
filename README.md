@@ -1,15 +1,14 @@
 # Auto-Amazon-Giveaways
-[UPDATE] Currently re-designing this project to use pyppeteer instead of selenium.
-This requires Python 3 now.  Giveaway entries are not working yet. 04/18.
+[UPDATE] Base no requirement giveaways are implemented for first page.  Need to include page iteration next. Should have more time to work on this now that I am not in class 04/29.
 
 Implementation for this project is currently a work-in-progress.  Issues are expected.
 
 ## Install
-[Python 3.6.X](https://www.python.org/downloads/) must be installed.
+[Python 3.6.x](https://www.python.org/downloads/) must be installed.
 
-After Python is installed, open `command-prompt` and use `pip` to install dependencies:
+After Python is installed, open `command-prompt` and use `pip` to install dependencies from project folder:
 
- - `pip install pyppeteer`
+ - `pip install -r requirements.txt`
 
 Assuming `git` is installed on the local machine:
 
@@ -17,7 +16,7 @@ Assuming `git` is installed on the local machine:
  - Perform `git clone https://github.com/zdrouse/Auto-Amazon-Giveaways`.
 
 ## Run
- - `python giveaway.py`
+ - `python give_it_away_now.py` or `python3 give_it_away_now.py`
 
 ## Profit
 ![bezos](http://i.imgur.com/L8yRHGN.jpg)
