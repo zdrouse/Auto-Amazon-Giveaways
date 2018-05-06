@@ -3,11 +3,13 @@ import getpass
 import logging
 import json
 import re
+import numpy
 from pyppeteer import launch
 from lib.prize import GiveAwayPrize
 from colorama import init, Fore, Back, Style
 
 init(autoreset=True)
+RANDOM_VAL = [7, 3, 2, 5, 10, 9, 6]
 
 class GiveAwayBot(object):
     def __init__(self):
@@ -46,7 +48,7 @@ class GiveAwayBot(object):
             self.password = getpass.getpass(pass_msg)
         self.browser = await get_browser()
         login_page = await self.browser.newPage()
-        await login_page.setViewport({'width': 1800, 'height': 1000})
+        await login_page.setViewport({'width': 1900, 'height': 1000})
         await login_page.goto(
             'https://www.amazon.com/ap/signin?_encoding=UTF8&ignoreAuthState=1&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fgiveaway%2Fhome%2Fref%3Dnav_custrec_signin&switch_account='
             )
@@ -59,7 +61,7 @@ class GiveAwayBot(object):
         await asyncio.sleep(2)
         # this will navigate to root Giveaway page after successful login and return the page.
         ga_page = await self._nav_to_ga(login_page)
-        await asyncio.sleep(3)
+        await asyncio.sleep(2)
         return ga_page
         #await self.browser.close()
 
@@ -77,15 +79,16 @@ class GiveAwayBot(object):
         print(ga_process)
 
     async def check_for_entered(self, prize_page):
-        await prize_page.waitForSelector('.qa-giveaway-result-text')
+        #await prize_page.waitForSelector('.qa-giveaway-result-text')
         ga_result_element = await prize_page.querySelector('.qa-giveaway-result-text')
-        ga_result = await prize_page.evaluate(
-            '(ga_result_element) => ga_result_element.textContent',
-            ga_result_element
-        )
-        if ga_result_element and "didn't win" in ga_result:
-            msg = Fore.MAGENTA + Style.BRIGHT + "    **** Already entered giveaway and you didn't win. ****"
-            print(msg)
+        if ga_result_element:
+            ga_result = await prize_page.evaluate(
+                '(ga_result_element) => ga_result_element.textContent',
+                ga_result_element
+            )
+            if "didn't win" in ga_result:
+                msg = Fore.MAGENTA + Style.BRIGHT + "    **** Already entered giveaway and you didn't win. ****"
+                print(msg)
             return True
         else:
             return False
@@ -100,29 +103,61 @@ class GiveAwayBot(object):
         if "didn't win" in ga_result:
             msg = Fore.YELLOW + Style.BRIGHT + "  **** You entered the giveaway but did not win. ****"
             print(msg)
+        elif "entry has been received" in ga_result:
+            msg = Fore.LIGHTMAGENTA_EX + Style.BRIGHT + "  **** You submitted an entry to this giveaway. ****"
+            print(msg)
         else:
             msg = Fore.GREEN + Style.BRIGHT + "   **** Maybe you won?? ****"
             print(msg)
 
     async def no_req_giveaways(self):
-        print()
         for prize in self.ga_prizes:
             if 'No entry requirement' in self.ga_prizes[prize]['Requirement'] and self.ga_prizes[prize]['Entered'] is False:
                 self.display_ga_process(self.ga_prizes[prize]['Name'])
                 prize_page = await self.browser.newPage()
-                await prize_page.setViewport({'width': 1800, 'height': 1000})
+                await prize_page.setViewport({'width': 1900, 'height': 1000})
                 await prize_page.goto(self.ga_prizes[prize]['Url'])
-                await asyncio.sleep(4)
+                # testing a random sleep methodology to avoid bot detection / captcha.
+                await asyncio.sleep(numpy.random.choice(RANDOM_VAL))
                 ga_entry = await self.check_for_entered(prize_page)
                 if ga_entry is False:
-                    await prize_page.waitForSelector('#box_click_target')
+                    await asyncio.sleep(numpy.random.choice(RANDOM_VAL))
                     prize_box = await prize_page.querySelector('#box_click_target')
-                    await prize_box.click()
-                    await asyncio.sleep(4)
+                    enter_button = await prize_page.querySelector('#enterSubmitForm')
+                    if prize_box:
+                        await prize_box.click()
+                    elif enter_button:
+                        await enter_button.click()
+                    await asyncio.sleep(numpy.random.choice(RANDOM_VAL))
                     await self.display_ga_result(prize_page)
                     await prize_page.close()
                 else:
                     await prize_page.close()
+            print()
+
+    async def check_for_last_page(self, ga_page):
+        last_page = await ga_page.xpath("//li[@class='a-disabled a-last']")
+        if last_page:
+            msg = Fore.LIGHTWHITE_EX + Style.BRIGHT + "**** The Last GiveAway Page has been reached.  Exiting... ****"
+            print(msg)
+            return True
+        else:
+            return False
+
+    async def iterate_page(self, ga_page):
+        next_page = await ga_page.xpath("//li[@class='a-last']")
+        next_page_href = await ga_page.evaluate(
+                '(next_page) => next_page.href',
+                next_page
+        )
+        if next_page:
+            msg = Fore.LIGHTGREEN_EX + Style.BRIGHT + "**** Moving to next giveaway page... ****"
+            print(msg)
+            return await self.browser.navigate(next_page_href)
+        else:
+            msg = Fore.LIGHTRED_EX + Style.BRIGHT + "**** Could not find Next Page for GiveAways, Exiting... ****"
+            print(msg)
+            quit(1)
             
     async def process_giveaways(self, ga_page):
 
